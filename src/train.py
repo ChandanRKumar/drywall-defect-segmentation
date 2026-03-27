@@ -16,10 +16,6 @@ Experiments (maps to experiments.md):
   EXP-06  python -m src.train --model gsam --eval-only             # zero-shot SAM
   EXP-07  python -m src.train --model gsam                         # SAM decoder FT
 
-Multi-GPU (DDP):
-  python -m src.train --devices 2
-  python -m src.train --devices 4 --strategy ddp_find_unused_parameters_true
-
 Resume:
   python -m src.train --resume checkpoints/clipseg/last.ckpt
 
@@ -453,8 +449,7 @@ def build_trainer(args: argparse.Namespace, exp_dir: "Path") -> L.Trainer:
         precision               = "16-mixed",
         gradient_clip_val   = config.GRAD_CLIP,
         accelerator         = "auto",
-        devices             = args.devices,
-        strategy            = args.strategy,
+        devices             = 1,
         callbacks           = callbacks,
         logger              = loggers,
         log_every_n_steps   = 10,
@@ -498,10 +493,6 @@ def main() -> None:
                         "closing the cascade train/inference distribution gap.")    
     p.add_argument("--eval-only",  action="store_true",
                    help="Zero-shot validation only — no training (EXP-00 / EXP-06)")
-    p.add_argument("--devices",    default="auto",
-                   help="GPUs: 'auto' | integer | list e.g. '2'")
-    p.add_argument("--strategy",   default="auto",
-                   help="Lightning strategy: auto | ddp | ddp_find_unused_parameters_true")
     p.add_argument("--exp-name",   default=None,
                    help="Experiment name → outputs/<exp-name>/ (auto-derived when omitted)")
     args = p.parse_args()
@@ -556,7 +547,7 @@ def main() -> None:
         log_dir.mkdir(parents=True, exist_ok=True)
         trainer = L.Trainer(
             accelerator         = "auto",
-            devices             = args.devices,
+            devices             = 1,
             precision           = "16-mixed",
             logger              = CSVLogger(str(log_dir), name="csv"),
             enable_progress_bar = True,

@@ -130,18 +130,6 @@ Outputs one `{image_id}__segment_{prompt_slug}.png` per image.
 
 ---
 
-## Multi-GPU training
-
-```bash
-# 2 GPUs
-python -m src.train --devices 2
-
-# 4 GPUs with DDP
-python -m src.train --devices 4 --strategy ddp_find_unused_parameters_true
-```
-
----
-
 ## Resume / warm-start
 
 ```bash
@@ -162,7 +150,7 @@ All defaults live in `src/config.py`. Override any of them via CLI:
 |---|---|---|
 | `--epochs` | 30 | Number of training epochs |
 | `--lr` | 3e-4 | Peak learning rate |
-| `--batch-size` | 8 | Batch size per GPU |
+| `--batch-size` | 8 | Batch size |
 | `--loss` | `bce_dice` | Loss: `bce_dice` or `focal_dice` |
 | `--datasets` | both | Space-separated subset: `cracks drywall_join` |
 
