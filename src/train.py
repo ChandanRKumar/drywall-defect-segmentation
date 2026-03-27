@@ -570,7 +570,8 @@ def main() -> None:
 
     score = trainer.checkpoint_callback.best_model_score
     path  = trainer.checkpoint_callback.best_model_path
-    print(f"\n✓  Best val/mIoU: {score:.4f}  →  {path}")
+    if score is not None:
+        print(f"\n✓  Best val/mIoU: {score:.4f}  →  {path}")
     print(f"   All outputs   →  {exp_dir}/")
 
 

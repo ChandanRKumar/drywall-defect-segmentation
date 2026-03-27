@@ -118,3 +118,28 @@ def pixel_accuracy(
     """Fraction of correctly classified pixels over the batch."""
     m = BinaryAccuracy(threshold=threshold).to(logits.device)
     return m(_probs(logits), targets.long()).item()
+
+
+class MetricAccumulator:
+    """Streaming accumulator — collects batched logits+labels, computes aggregate metrics.
+
+    Usage::
+
+        acc = MetricAccumulator()
+        for batch in loader:
+            acc.update(logits, labels)
+        results = acc.compute()   # dict[str, float]
+    """
+
+    def __init__(self, threshold: float = config.THRESHOLD) -> None:
+        self._metrics  = make_metrics()
+        self._threshold = threshold
+
+    def update(self, logits: torch.Tensor, targets: torch.Tensor) -> None:
+        self._metrics = self._metrics.to(logits.device)
+        self._metrics.update(_probs(logits), targets.long())
+
+    def compute(self) -> dict[str, float]:
+        result = self._metrics.compute()
+        self._metrics.reset()
+        return {k: v.item() for k, v in result.items()}

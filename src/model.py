@@ -215,9 +215,12 @@ def load_checkpoint(
     path: str,
     device: torch.device | str = "cpu",
     freeze_backbone: bool = True,
-) -> ClipSegModel:
-    """Load a saved checkpoint."""
+) -> "ClipSegModel":
+    """Load a ClipSegModel from a Lightning checkpoint."""
     model = build_model(freeze_backbone=freeze_backbone)
-    state  = torch.load(path, map_location=device, weights_only=True)
-    model.load_state_dict(state["model_state_dict"])
+    ckpt  = torch.load(path, map_location=device, weights_only=False)
+    # Lightning stores state as {"model.<key>": ...}; strip the prefix.
+    raw = ckpt.get("state_dict", ckpt.get("model_state_dict", ckpt))
+    sd  = {k.removeprefix("model."): v for k, v in raw.items()}
+    model.load_state_dict(sd, strict=False)
     return model
