@@ -39,15 +39,14 @@ def export_masks(
 
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    # Build lookup: image_id_stem → original PIL path (for resizing mask back)
+    # Build lookup: coco_id (str) → original image path (for resizing mask back)
     img_lookup: dict[str, Path] = {}
     for key in datasets:
         val_dir  = config.DATASETS[key]["dir"] / "valid"
         ann_file = val_dir / "_annotations.coco.json"
         imgs     = json.load(open(ann_file))["images"]
         for meta in imgs:
-            stem = Path(meta["file_name"]).stem
-            img_lookup[stem] = val_dir / meta["file_name"]
+            img_lookup[str(meta["id"])] = val_dir / meta["file_name"]
 
     _, val_ds = build_datasets(datasets)
     loader    = build_dataloader(val_ds, batch_size=batch_size, shuffle=False, num_workers=2)

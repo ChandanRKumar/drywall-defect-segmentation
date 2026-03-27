@@ -235,9 +235,8 @@ class DrywallSegDataset(Dataset):
             # Training: randomly sample from all prompt variants for robustness
             prompt = random.choice(self.prompts)
 
-        # Image ID for output naming ──────────────────────────────────────────
-        stem     = Path(img_meta["file_name"]).stem
-        image_id = f"{stem}"
+        # Image ID for output naming — use the COCO integer id (e.g. 123)
+        image_id = str(img_meta["id"])
 
         return {
             "pixel_values": pixel_values,   # (3, H, W)  float32
