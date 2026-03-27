@@ -1,0 +1,13 @@
+# Symlinked runtime dirs (data, checkpoints, outputs are not part of the code)
+data/
+checkpoints/
+outputs/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+
+# OS
+.DS_Store
